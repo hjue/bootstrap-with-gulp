@@ -42,4 +42,4 @@ gulp.task('watch',['icons','css','js'],function () {
   ], ['js'])  
 })
 
-gulp.task('default',['watch']);
+gulp.task('default',['icons','css','js']);
