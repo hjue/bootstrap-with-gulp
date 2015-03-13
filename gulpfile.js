@@ -8,13 +8,15 @@ var minifyCSS = require('gulp-minify-css');
 var addsrc = require('gulp-add-src');
 var path = require('path')
 var concat = require('gulp-concat');
+var imagemin = require('gulp-imagemin');
+var del = require('del');
 
 var src = path.resolve.bind(path, 'assets')
 var dest = path.resolve.bind(path, 'public/static')
 
 gulp.task('icons', function() { 
     return gulp.src('./node_modules/font-awesome/fonts/**.*') 
-        .pipe(gulp.dest('./public/static/fonts')); 
+        .pipe(gulp.dest(dest('fonts'))); 
 });
 
 
@@ -24,7 +26,7 @@ gulp.task('css', function () {
     .pipe(less({compress: true}))
     .pipe(autoprefixer())
     .pipe(minifyCSS({keepSpecialComments:0}))
-    .pipe(gulp.dest('public/static/css'))
+    .pipe(gulp.dest(dest('css')))
 })
 
 
@@ -35,18 +37,29 @@ gulp.task('js', function() {
     // .pipe(addsrc(src('js/iscroll-probe.js')))
     .pipe(concat('app.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('public/static/js'));
+    .pipe(gulp.dest(dest('js')));
 });
 
+gulp.task('images', function() {
 
-gulp.task('watch',['icons','css','js'],function () {
+  del(dest('images/*'));
+
+  return gulp.src(src('images/*'))
+    .pipe(imagemin({ optimizationLevel: 5 }))
+    .pipe(gulp.dest(dest('images')));
+});
+
+gulp.task('watch',['images','icons','css','js'],function () {
   gulp.watch([
-    'assets/css/*.less',
+    src('css/*.less'),
   ], ['css'])
+  gulp.watch([
+    src('images/*.png'),
+  ], ['images'])
 
   gulp.watch([
-    'assets/js/*.js',
+    src('js/*.js')
   ], ['js'])
 })
 
-gulp.task('default',['icons','css','js']);
+gulp.task('default',['images','icons','css','js']);
