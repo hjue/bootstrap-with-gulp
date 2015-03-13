@@ -10,6 +10,9 @@ var path = require('path')
 var concat = require('gulp-concat');
 var imagemin = require('gulp-imagemin');
 var del = require('del');
+var gutil = require('gulp-util');
+
+var debug = false;
 
 var src = path.resolve.bind(path, 'assets')
 var dest = path.resolve.bind(path, 'public/static')
@@ -21,23 +24,30 @@ gulp.task('icons', function() { 
 
 
 gulp.task('css', function () {
-  return gulp.src('assets/css/app.less')
+  var step = gulp.src(src('css/app.less'))
     .pipe(plumber())
-    .pipe(less({compress: true}))
+    .pipe(less({compress: !debug}))
     .pipe(autoprefixer())
-    .pipe(minifyCSS({keepSpecialComments:0}))
-    .pipe(gulp.dest(dest('css')))
+  if(!debug)
+    step = step.pipe(minifyCSS({keepSpecialComments:0}))
+
+  step.pipe(gulp.dest(dest('css')))
+
 })
 
 
 gulp.task('js', function() {
 
-  gulp.src(['assets/js/app.js'])
+  var step = gulp.src([src('js/app.js')])
     .pipe(browserify())
     // .pipe(addsrc(src('js/iscroll-probe.js')))
     .pipe(concat('app.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest(dest('js')));
+
+  if(!debug)
+    step = step.pipe(uglify())
+
+  step.pipe(gulp.dest(dest('js')));
+
 });
 
 gulp.task('images', function() {
@@ -48,6 +58,12 @@ gulp.task('images', function() {
     .pipe(imagemin({ optimizationLevel: 5 }))
     .pipe(gulp.dest(dest('images')));
 });
+
+gulp.task('debug', ['images','icons','css','js'], function () {
+  debug = true;
+  gutil.log( gutil.colors.green('RUNNING IN DEBUG MODE') );
+  gulp.start('watch');
+})
 
 gulp.task('watch',['images','icons','css','js'],function () {
   gulp.watch([
