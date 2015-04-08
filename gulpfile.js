@@ -59,7 +59,7 @@ gulp.task('images', function() {
 
   del(dest('images/*'));
 
-  return gulp.src(src('images/*'))
+  return gulp.src(src('images/*.{jpg,jpeg,png,gif}'))
     .pipe(imagemin({ optimizationLevel: 5 }))
     .pipe(gulp.dest(dest('images')));
 });
@@ -75,7 +75,7 @@ gulp.task('watch',['images','icons','css','js','html'],function () {
     src('css/*.less'),
   ], ['css'])
   gulp.watch([
-    src('images/*'),
+    src('images/**'),
   ], ['images'])
   gulp.watch([
     src('html/*.html'),
