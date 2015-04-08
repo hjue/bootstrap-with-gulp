@@ -22,6 +22,11 @@ gulp.task('icons', function() { 
         .pipe(gulp.dest(dest('fonts'))); 
 });
 
+gulp.task('html', function() { 
+    return gulp.src(src('html/*.html')) 
+        .pipe(gulp.dest(dest('html'))); 
+});
+
 
 gulp.task('css', function () {
   var step = gulp.src(src('css/app.less'))
@@ -59,20 +64,22 @@ gulp.task('images', function() {
     .pipe(gulp.dest(dest('images')));
 });
 
-gulp.task('debug', ['images','icons','css','js'], function () {
+gulp.task('debug', ['images','icons','css','js','html'], function () {
   debug = true;
   gutil.log( gutil.colors.green('RUNNING IN DEBUG MODE') );
   gulp.start('watch');
 })
 
-gulp.task('watch',['images','icons','css','js'],function () {
+gulp.task('watch',['images','icons','css','js','html'],function () {
   gulp.watch([
     src('css/*.less'),
   ], ['css'])
   gulp.watch([
-    src('images/*.png'),
+    src('images/*'),
   ], ['images'])
-
+  gulp.watch([
+    src('html/*.html'),
+  ], ['html'])
   gulp.watch([
     src('js/*.js')
   ], ['js'])
